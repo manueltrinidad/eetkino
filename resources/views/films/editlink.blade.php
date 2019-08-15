@@ -1,0 +1,1 @@
+<a href="#" class="text-dark" data-toggle="modal" data-target="#editFilmModal"><i class="material-icons">edit</i></a>
