@@ -6,12 +6,20 @@ use App\Review;
 use App\Film;
 use Illuminate\Http\Request;
 use App\Http\Requests\ReviewStoreRequest;
+use Illuminate\Support\Facades\Auth;
 
 class ReviewController extends Controller
 {
     public function show(Review $review)
     {
         $film = Film::where('id', $review->film->id)->first();
+        if($review->is_draft == 1) {
+            if(Auth::user()) {
+                return view('reviews.show', compact('review', 'film'));
+            } else {
+                return abort(403);
+            }
+        }
         return view('reviews.show', compact('review', 'film'));
     }
     public function store(ReviewStoreRequest $request)

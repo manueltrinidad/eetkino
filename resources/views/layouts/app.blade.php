@@ -10,6 +10,7 @@
         @yield('content')
         @include('layouts.partials.createbutton')
         @include('layouts.partials.bottomscripts')
+        @yield('optional-scripts')
         @include('cookieConsent::index')
     </div>
 </body>

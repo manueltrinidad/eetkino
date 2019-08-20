@@ -13,6 +13,9 @@ echo "$film->title_english ($year)"
         <div class="row">
             <div class="col-sm-8">
                 <h2>
+                    @if ($review->is_draft == 1)
+                        DRAFT
+                    @endif
                     Review: {{$film->title_english}} ({{$year}})
                     @auth
                     @include('reviews.editlink')

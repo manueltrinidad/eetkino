@@ -10,9 +10,9 @@ class MainController extends Controller
 {
     public function index()
     {
-        $id = Auth::id();
         $reviews = Review::where('is_draft', 0)->orderBy('review_date', 'desc')->take(16)->get();
-        return view('index', compact('reviews', 'id'));
+        $drafts = Review::where('is_draft', 1)->orderBy('review_date', 'desc')->take(16)->get();
+        return view('index', compact('reviews', 'drafts'));
     }
     public function about()
     {
