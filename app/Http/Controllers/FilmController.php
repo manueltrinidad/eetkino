@@ -33,13 +33,10 @@ class FilmController extends Controller
         'poster_url' => $v['poster_url']
         ]);
         
-        $directors = explode(',', $v['directors']);
-        $writers = explode(',', $v['writers']);
-        $countries = explode(',', $v['countries']);
-        
-        // All that explode part will be eliminated with the
-        // HTML / AJAX tags
-        
+        $directors = $v['directors'];
+        $writers = $v['writers'];
+        $countries = $v['countries'];
+
         $data = Name::find($directors);
         $film->names()->attach($data, ['credit' => 'director']);
         unset($data);

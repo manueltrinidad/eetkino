@@ -17,7 +17,6 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/', 'MainController@index')->name('index');
 Route::get('/about', 'MainController@about')->name('about');
 Route::get('/stats', 'MainController@stats')->name('stats');
-Route::get('/search', 'MainController@search')->name('search');
 Route::get('/profile', 'MainController@profile')->name('profile')->middleware('auth');
 Auth::routes();
 
@@ -43,6 +42,7 @@ Route::put('/films/{film}/watchlists', 'FilmController@editwatchlists')->name('f
 Route::get('/names', 'NameController@index')->name('names.index')->middleware('auth'); // Temporary
 Route::get('/names/{name}', 'NameController@show')->name('names.show');
 Route::post('/names', 'NameController@store')->name('names.store')->middleware('auth');
+Route::post('/names/ajax', 'NameController@ajax_store')->name('names.ajaxstore')->middleware('auth');
 Route::put('/names/{name}', 'NameController@update')->name('names.update')->middleware('auth');
 Route::delete('/names/{name}', 'NameController@destroy')->name('names.destroy')->middleware('auth');
 
@@ -51,6 +51,7 @@ Route::delete('/names/{name}', 'NameController@destroy')->name('names.destroy')-
 Route::get('/countries', 'CountryController@index')->name('countries.index')->middleware('auth'); // Temporary
 Route::get('/countries/{country}', 'CountryController@show')->name('countries.show');
 Route::post('/countries', 'CountryController@store')->name('countries.store')->middleware('auth');
+Route::post('/countries/ajax', 'CountryController@ajax_store')->name('countries.ajaxstore')->middleware('auth');
 Route::put('/countries/{country}', 'CountryController@update')->name('countries.update')->middleware('auth');
 Route::delete('/countries/{country}', 'CountryController@destroy')->name('countries.destroy')->middleware('auth');
 
@@ -62,3 +63,10 @@ Route::post('/watchlists', 'WatchlistController@store')->name('watchlists.store'
 Route::put('/watchlists/{watchlist}', 'WatchlistController@update')->name('watchlists.update')->middleware('auth');
 Route::delete('/watchlists/{watchlist}', 'WatchlistController@destroy')->name('watchlists.destroy')->middleware('auth');
 Route::put('/watchlists/{watchlist}/films', 'WatchlistController@editfilms')->name('watchlists.editfilms')->middleware('auth');
+
+// Search
+
+Route::get('/search/bar', 'SearchController@bar')->name('search.bar');
+Route::get('/search/name', 'SearchController@name')->name('search.name');
+Route::get('/search/country', 'SearchController@country')->name('search.country');
+Route::get('/search/film', 'SearchController@film')->name('search.film');

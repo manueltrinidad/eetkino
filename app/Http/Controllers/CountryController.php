@@ -23,6 +23,12 @@ class CountryController extends Controller
         $country = Country::create($attributes);
         return back();
     }
+    public function ajax_store(CountryStoreRequest $request)
+    {
+        $attributes = $request->validated();
+        $country = Country::create($attributes);
+        return response()->json(compact('country'));
+    }
     public function update(CountryStoreRequest $request, Country $country)
     {
         $attributes = $request->validated();

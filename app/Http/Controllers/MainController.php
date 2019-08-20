@@ -11,8 +11,7 @@ class MainController extends Controller
     public function index()
     {
         $id = Auth::id();
-        $reviews = Review::all()->take(16);
-
+        $reviews = Review::where('is_draft', 0)->orderBy('review_date', 'desc')->take(16)->get();
         return view('index', compact('reviews', 'id'));
     }
     public function about()

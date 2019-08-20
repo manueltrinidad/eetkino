@@ -3,6 +3,7 @@
 @section('title', 'KiNO')
 
 @section('content')
+@include('layouts.partials.create')
 <br>
 <h3>Latest Reviews</h3>
 <hr>
@@ -21,7 +22,6 @@
             <div class="card-body">
                 <h5 class="card-title"><a href="{{route('reviews.show', $review->id)}}">{{$review->film->title_english}}</a></h5>
                 <p class="card-text">{{$review->score}} / 100</p>
-                {{$loop->iteration%5}}
             </div>
         </div>
     </div>

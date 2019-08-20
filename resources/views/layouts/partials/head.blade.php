@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="{{asset('css/style.css')}}">
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="shortcut icon" href="{{ asset('img/favicon.ico') }}">
+    <script src="{{ asset('js/jquery-3.4.1.js') }}"></script>
     <title>
         @yield('title', 'KiNO')
     </title>

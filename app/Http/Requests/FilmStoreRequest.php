@@ -30,9 +30,9 @@ class FilmStoreRequest extends FormRequest
             'imdb_id' => 'nullable|alpha_num|unique:films,imdb_id',
             'film_type' => 'required|string|alpha',
             'poster_url' => 'nullable|url',
-            'directors' => 'required',
-            'writers' => 'required',
-            'countries' => 'required'
+            'directors' => 'required|array',
+            'writers' => 'required|array',
+            'countries' => 'required|array'
         ];
     }
 }

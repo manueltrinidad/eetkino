@@ -23,6 +23,12 @@ class NameController extends Controller
         $name = Name::create($attributes);
         return back();
     }
+    public function ajax_store(NameStoreRequest $request)
+    {
+        $attributes = $request->validated();
+        $name = Name::create($attributes);
+        return response()->json(compact('name'));
+    }
     public function update(NameStoreRequest $request, Name $name)
     {
         $attributes = $request->validated();
