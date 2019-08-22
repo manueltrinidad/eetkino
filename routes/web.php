@@ -18,7 +18,7 @@ Route::get('/', 'MainController@index')->name('index');
 Route::get('/about', 'MainController@about')->name('about');
 Route::get('/stats', 'MainController@stats')->name('stats');
 Route::get('/profile', 'MainController@profile')->name('profile')->middleware('auth');
-Auth::routes();
+Auth::routes([ 'register' => false, 'reset' => false ]);
 
 // Reviews
 
@@ -32,6 +32,7 @@ Route::delete('/reviews/{review}', 'ReviewController@destroy')->name('reviews.de
 
 Route::get('/films', 'FilmController@index')->name('films.index')->middleware('auth'); // Temporary
 Route::get('/films/{film}', 'FilmController@show')->name('films.show');
+Route::get('/films/{film}/json', 'FilmController@show_json')->name('films.showjson');
 Route::post('/films', 'FilmController@store')->name('films.store')->middleware('auth');
 Route::put('/films/{film}', 'FilmController@update')->name('films.update')->middleware('auth');
 Route::delete('/films/{film}', 'FilmController@destroy')->name('films.destroy')->middleware('auth');

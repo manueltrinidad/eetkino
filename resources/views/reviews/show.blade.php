@@ -7,6 +7,8 @@ echo "$film->title_english ($year)"
 ?>
 @endsection
 @section('content')
+<meta name="film-id-meta" content="{{$film->id}}"/>
+<meta name="review-id-meta" content="{{$review->id}}"/>
 <br>
 <div class="row justify-content-center">
     <div class="col-sm-10">
@@ -14,7 +16,7 @@ echo "$film->title_english ($year)"
             <div class="col-sm-8">
                 <h2>
                     @if ($review->is_draft == 1)
-                        DRAFT
+                    DRAFT
                     @endif
                     Review: {{$film->title_english}} ({{$year}})
                     @auth
@@ -27,50 +29,64 @@ echo "$film->title_english ($year)"
                 By: KiNO {{$review->review_date}}
                 <hr>
             </div>
-            <div class="col-sm-4">
-                <h2>
-                    {{ucfirst($film->film_type)}} Information
-                    @auth
-                    @include('films.editlink')
-                    @endauth
-                </h2>
+            <div id="film-info" class="col-sm-4">
+                <div id="poster">
+                    @if ($film->poster_url)
+                    <img src="{{$film->poster_url}}" alt="{{$film->title_english}}" class="films-show-poster">
+                    <hr>
+                    @endif
+                </div>
+                <div id="title-english">
+                    <h4>
+                        @if ($film->imdb_id)
+                        <a href="https://www.imdb.com/title/{{$film->imdb_id}}">{{$film->title_english}}</a>
+                        @else
+                        {{$film->title_english}}
+                        @endif
+                        @auth
+                        @include('films.editlink')
+                        @endauth
+                    </h4>
+                </div>
+                <div id="title-native">
+                    @if ($film->title_native)
+                    <h6>{{$film->title_native}} (native title)</h6>
+                    @endif
+                </div>
+                <div id="release-date">
+                    <h6>Release Date: {{$full_date}}</h6>
+                </div>
                 <hr>
-                <h4><a href="{{route('films.show', $film->id)}}">{{$film->title_english}}</a></h4>
-                @if ($film->title_native)
-                <h6>{{$film->title_native}} (native title)</h6>
-                @endif
-                <h6>Release Date: {{$full_date}}</h6>
-                <hr>
-                <h4>Production Countries</h4>
-                <p>
-                    @foreach ($film->countries as $country)
-                    <b>{{$country->name}}</b> |
-                    @endforeach
-                </p>
+                <div id="countries">
+                    <h4>Production Countries</h4>
+                    <p>
+                        @foreach ($film->countries as $country)
+                        <b>{{$country->name}}</b> |
+                        @endforeach
+                    </p>
+                </div>
                 <hr>
                 <h4>Crew</h4>
-                <h6><b>Directors</b></h6>
-                <p>
-                    @foreach ($film->names as $name)
-                    @if ($name->pivot->credit == 'director')
-                    <a href="{{route('names.show', $name->id)}}">{{$name->name}}</a> |
-                    @endif
-                    @endforeach
-                </p>
-                <h6><b>Writers</b></h6>
-                <p>
-                    @foreach ($film->names as $name)
-                    @if ($name->pivot->credit == 'writer')
-                    <a href="{{route('names.show', $name->id)}}">{{$name->name}}</a> |
-                    @endif
-                    @endforeach
-                </p>
-                @if ($film->imdb_id)
-                <h6><a href="https://www.imdb.com/title/{{$film->imdb_id}}">IMDB Profile</a></h6>
-                @endif
-                @if ($film->poster_url)
-                <img src="{{$film->poster_url}}" alt="{{$film->title_english}}" class="films-show-poster">
-                @endif
+                <div id="directors">
+                    <h6><b>Directors</b></h6>
+                    <p>
+                        @foreach ($film->names as $name)
+                        @if ($name->pivot->credit == 'director')
+                        <a href="{{route('names.show', $name->id)}}">{{$name->name}}</a> |
+                        @endif
+                        @endforeach
+                    </p>
+                </div>
+                <div id="writers">
+                    <h6><b>Writers</b></h6>
+                    <p>
+                        @foreach ($film->names as $name)
+                        @if ($name->pivot->credit == 'writer')
+                        <a href="{{route('names.show', $name->id)}}">{{$name->name}}</a> |
+                        @endif
+                        @endforeach
+                    </p>
+                </div>
             </div>
         </div>
     </div>

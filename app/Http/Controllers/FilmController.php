@@ -22,6 +22,10 @@ class FilmController extends Controller
         $watchlists = Watchlist::all();
         return view('films.show', compact('film', 'watchlists'));
     }
+    public function show_json(Film $film)
+    {
+        return response()->json(compact('film'));
+    }
     public function store(FilmStoreRequest $request)
     {
         $v = $request->validated();

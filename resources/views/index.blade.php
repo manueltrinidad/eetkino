@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'KiNO')
+@section('title', 'Culture Kino')
 
 @section('content')
 @include('layouts.partials.create')
@@ -30,6 +30,9 @@
 <br>
 @endif
 @endforeach
+
+@if (count($drafts) != 0)
+
 <hr>
 @auth
 <h3>Drafts</h3>
@@ -58,6 +61,9 @@
 @endif
 @endforeach
 @endauth
+
+@endif
+
 @endsection
 
 @section('optional-scripts')
