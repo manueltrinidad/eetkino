@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use App\Review;
+use App\Film;
 use Illuminate\Http\Request;
 
 class MainController extends Controller
@@ -20,7 +21,8 @@ class MainController extends Controller
     }
     public function stats()
     {
-        return view('stats');
+        $reviews = Review::where('is_draft', false)->orderBy('review_date', 'desc')->get();
+        return view('stats', compact('reviews'));
     }
     public function search()
     {
