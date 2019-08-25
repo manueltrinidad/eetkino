@@ -24,7 +24,9 @@ class FilmController extends Controller
     }
     public function show_json(Film $film)
     {
-        return response()->json(compact('film'));
+        $countries = $film->countries;
+        $names = $film->names;
+        return response()->json(compact('film', 'countries', 'names'));
     }
     public function store(FilmStoreRequest $request)
     {
@@ -67,12 +69,9 @@ class FilmController extends Controller
         $film->update($attributes);
         $film->save();
         
-        $directors = explode(',', $attributes['directors']);
-        $writers = explode(',', $attributes['writers']);
-        $countries = explode(',', $attributes['countries']);
-        
-        // All that explode part will be eliminated with the
-        // HTML / AJAX tags
+        $directors = $attributes['directors'];
+        $writers = $attributes['writers'];
+        $countries = $attributes['countries'];
 
         // This whole updateExistingPivot isn't working properly
         // It duplicates credits for each repeated id.

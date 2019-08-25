@@ -24,6 +24,7 @@ Auth::routes([ 'register' => false, 'reset' => false ]);
 
 Route::get('/reviews', 'ReviewController@index')->name('reviews.index')->middleware('auth'); // Probs Not Temporary
 Route::get('/reviews/{review}', 'ReviewController@show')->name('reviews.show');
+Route::get('/reviews/{review}/json', 'ReviewController@show_json')->name('reviews.showjson');
 Route::post('/reviews', 'ReviewController@store')->name('reviews.store')->middleware('auth');
 Route::put('/reviews/{review}', 'ReviewController@update')->name('reviews.update')->middleware('auth');
 Route::delete('/reviews/{review}', 'ReviewController@destroy')->name('reviews.destroy')->middleware('auth');

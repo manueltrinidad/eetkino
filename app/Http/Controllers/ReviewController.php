@@ -22,6 +22,11 @@ class ReviewController extends Controller
         }
         return view('reviews.show', compact('review', 'film'));
     }
+    public function show_json(Review $review)
+    {
+        $film = $review->film;
+        return response()->json(compact('review', 'film'));
+    }
     public function store(ReviewStoreRequest $request)
     {
         $attributes = $request->validated();

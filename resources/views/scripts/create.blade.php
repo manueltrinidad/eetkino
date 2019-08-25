@@ -1,19 +1,22 @@
 <script>
     $(document).ready(function() {
+
+        // Functions -----------------------------------------
         
         // CSRF used for all POST/PUT/DELETE
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
         
-        // ----------------
-        // Search Directors
-        // ----------------
-        
-        // Create dropdown
-        $('#search-bar-director').on('keyup', function() {
-            
-            $('#search-director-dropdown').empty();
-            var url = '/search/name/';
-            var q = $(this).val();
+        // Create Dropdown
+        function search_bar(title, q)
+        {
+            $('#search-'+title+'-dropdown').empty();
+            if (title == 'director' || title == 'writer') {
+                var url = '/search/name/';
+            } else if (title == 'country') {
+                var url = '/search/country/';
+            } else if (title == 'film') {
+                var url = '/search/film/';
+            }  
             
             $.ajax({
                 dataType: "json",
@@ -21,126 +24,139 @@
                 data: {query: q}
             })
             .done(function(data) {
-                $.each(data.names, function(i, item) {
-                    $('#search-director-dropdown').append($('<a>', {
-                        class : 'dropdown-item director-dropdown',
-                        text : item.name,
-                        href: '#'
-                    }).append($('<input>', {
-                        value : item.id,
-                        class : 'dropdown-item',
-                        hidden : 'hidden'
-                    })));
-                });
-            });
-            
-        });
+                if (title == 'country') {
+                    $.each(data.countries, function(i, item) {            
+                        $('#search-'+title+'-dropdown').append($('<a>', {
+                            class : 'dropdown-item '+title+'-dropdown',
+                            text : item.name,
+                            href: '#'
+                        }).append($('<input>', {
+                            value : item.id,
+                            class : 'dropdown-item',
+                            hidden : 'hidden'
+                        })));
+                    });
+                } else if (title == 'film') {
+                    $.each(data.films, function(i, item) {
+                        $('#search-'+title+'-dropdown').append($('<a>', {
+                            class : 'dropdown-item '+title+'-dropdown',
+                            text : item.name,
+                            href: '#'
+                        }).append($('<input>', {
+                            value : item.id,
+                            class : 'dropdown-item',
+                            hidden : 'hidden'
+                        })));
+                    });
+                } else if (title == 'director' || title == 'writer') {
+                    $.each(data.names, function(i, item) {
+                        $('#search-'+title+'-dropdown').append($('<a>', {
+                            class : 'dropdown-item '+title+'-dropdown',
+                            text : item.name,
+                            href: '#'
+                        }).append($('<input>', {
+                            value : item.id,
+                            class : 'dropdown-item',
+                            hidden : 'hidden'
+                        })));
+                    });
+                }
+            }); 
+        }
         
-        // Create pills
-        $('#search-director-dropdown').on('click', '.director-dropdown', function() {
-            var id = $(this).children('input').val();
-            var name = $(this).text();
-            $('#add-director').append($('<a>', {
+        // Create Pills
+        function create_pills(id, name, title)
+        {
+            if (title == 'director') {
+                var input_name = 'directors[]';
+            } else if (title == 'writer') {
+                var input_name = 'writers[]';
+            } else if (title == 'country') {
+                var input_name = 'countries[]';
+            }
+            $('<a>', {
                 class : 'badge badge-pill badge-dark pill-rm',
                 text : name,
                 href: '#'
-            }).append($('<input>', {
+            }).appendTo('#add-'+title);
+            $('<input>', {
                 value : id,
-                name : 'directors[]',
+                name : input_name,
                 hidden : 'hidden'
-            })));
+            }).appendTo($('#add-'+title).children('a').last());
+            
+        }
+        // Create Entities in Database and Pill in Return
+        function create_entity(name, url, title)
+        {
+            $.ajax({
+                dataType: "json",
+                url: url,
+                type: 'POST',
+                data: {
+                    _token: CSRF_TOKEN, 
+                    name: name
+                },
+                success: function(data) {
+                    if (title == 'director' || title == 'writer') {
+                        create_pills(data.name.id, data.name.name, title);
+                    } else if (title == 'country') {
+                        create_pills(data.country.id, data.country.name, title);
+                    }
+                }
+            });
+        }
+
+        // Remove Pill (applies for all .pill-rm)
+        $(document).on('click', '.pill-rm', function() {
+            $(this).remove();
+        });
+
+        //----------------------------------------------
+
+        // ----------------
+        // Search Directors
+        // ----------------
+        
+        $(document).on('keyup', '#search-bar-director', function() {
+            var q = $(this).val();
+            search_bar('director', q);
+        });
+        
+        $(document).on('click', '.director-dropdown', function() {
+            var id = $(this).children('input').val();
+            var name = $(this).text();
+            create_pills(id, name, 'director');
         });
         
         // ----------------
         // Search Writers
         // ----------------
         
-        // Create dropdown
         $('#search-bar-writer').on('keyup', function() {
-            
-            $('#search-writer-dropdown').empty();
-            var url = '/search/name/';
             var q = $(this).val();
-            
-            $.ajax({
-                dataType: "json",
-                url: url,
-                data: {query: q}
-            }).done(function(data) {
-                $.each(data.names, function(i, item) {
-                    $('#search-writer-dropdown').append($('<a>', {
-                        class : 'dropdown-item writer-dropdown',
-                        text : item.name,
-                        href: '#'
-                    }).append($('<input>', {
-                        value : item.id,
-                        class : 'dropdown-item',
-                        hidden : 'hidden'
-                    })));
-                });
-            });
-            
+            search_bar('writer', q);
         });
         
-        // Create pills
         $('#search-writer-dropdown').on('click', '.writer-dropdown', function() {
             var id = $(this).children('input').val();
             var name = $(this).text();
-            $('#add-writer').append($('<a>', {
-                class : 'badge badge-pill badge-dark pill-rm',
-                text : name,
-                href: '#'
-            }).append($('<input>', {
-                value : id,
-                name : 'writers[]',
-                hidden : 'hidden'
-            })));
+            create_pills(id, name, 'writer');
         });
         
         // ----------------
         // Search Countries
         // ----------------
         
-        // Create dropdown
         $('#search-bar-country').on('keyup', function() {
-            
-            $('#search-country-dropdown').empty();
-            var url = '/search/country/';
             var q = $(this).val();
-            
-            $.ajax({
-                dataType: "json",
-                url: url,
-                data: {query: q}
-            }).done(function(data) {
-                $.each(data.countries, function(i, item) {
-                    $('#search-country-dropdown').append($('<a>', {
-                        class : 'dropdown-item country-dropdown',
-                        text : item.name,
-                        href: '#'
-                    }).append($('<input>', {
-                        value : item.id,
-                        class : 'dropdown-item',
-                        hidden : 'hidden'
-                    })));
-                });
-            });
-            
+            search_bar('country', q);
         });
         
-        // Create pills
         $('#search-country-dropdown').on('click', '.country-dropdown', function() {
             var id = $(this).children('input').val();
             var name = $(this).text();
-            $('#add-country').append($('<a>', {
-                class : 'badge badge-pill badge-dark pill-rm',
-                text : name,
-                href: '#'
-            }).append($('<input>', {
-                value : id,
-                name : 'countries[]',
-                hidden : 'hidden'
-            })));
+            create_pills(id, name, 'country');
         });
         
         // ----------------
@@ -149,45 +165,16 @@
         
         // Create dropdown
         $('#search-bar-film').on('keyup', function() {
-            
-            $('#search-film-dropdown').empty();
-            var url = '/search/film/';
             var q = $(this).val();
-            
-            $.ajax({
-                dataType: "json",
-                url: url,
-                data: {query: q}
-            }).done(function(data) {
-                $.each(data.films, function(i, item) {
-                    $('#search-film-dropdown').append($('<a>', {
-                        class : 'dropdown-item film-dropdown',
-                        text : item.title_english,
-                        href: '#'
-                    }).append($('<input>', {
-                        value : item.id,
-                        hidden : 'hidden'
-                    })));
-                });
-            });
-            
+            search_bar('film', q);
         });
         
         // Create pills
         $('#search-film-dropdown').on('click', '.film-dropdown', function() {
-            $('.pill-rm').remove();
+            $('.pill-rm').remove(); // Since there can only be one film.
             var id = $(this).children('input').val();
             var title_english = $(this).text();
-            $('#add-film').append($('<a>', {
-                class : 'badge badge-pill badge-dark pill-rm',
-                text : title_english,
-                href: '#'
-            }).append($('<input>', {
-                value : id,
-                name : 'film_id',
-                hidden : 'hidden',
-                required : 'required'
-            })));
+            create_pills(id, name, 'film');
         });
         
         
@@ -201,35 +188,9 @@
         // ------------
         
         $(document).on('click', '#create-director', function() {
-            
             var url = '/names/ajax';
             var name = $('#director-name').val();
-            $.ajax({
-                dataType: "json",
-                url: url,
-                type: 'POST',
-                data: {
-                    _token: CSRF_TOKEN, 
-                    name: name
-                },
-                success: function(data) {
-                    // Create pills
-                    $('#search-director-dropdown', function() {
-                        var id = data.name.id;
-                        var name = data.name.name;
-                        $('#add-director').append($('<a>', {
-                            class : 'badge badge-pill badge-dark pill-rm',
-                            text : name,
-                            href: '#'
-                        }).append($('<input>', {
-                            value : id,
-                            name : 'directors[]',
-                            hidden : 'hidden'
-                        })));
-                    });
-                    
-                }
-            });
+            create_entity(name, url, 'director');
         });
         
         // ------------
@@ -240,32 +201,7 @@
             
             var url = '/names/ajax';
             var name = $('#writer-name').val();
-            $.ajax({
-                dataType: "json",
-                url: url,
-                type: 'POST',
-                data: {
-                    _token: CSRF_TOKEN, 
-                    name: name
-                },
-                success: function(data) {
-                    // Create pills
-                    $('#search-writer-dropdown', function() {
-                        var id = data.name.id;
-                        var name = data.name.name;
-                        $('#add-writer').append($('<a>', {
-                            class : 'badge badge-pill badge-dark pill-rm',
-                            text : name,
-                            href: '#'
-                        }).append($('<input>', {
-                            value : id,
-                            name : 'writers[]',
-                            hidden : 'hidden'
-                        })));
-                    });
-                    
-                }
-            });
+            create_entity(name, url, 'writer');
         });
         
         // ------------
@@ -273,36 +209,9 @@
         // ------------
         
         $(document).on('click', '#create-country', function() {
-            
             var url = '/countries/ajax';
             var name = $('#country-name').val();
-            $.ajax({
-                dataType: "json",
-                url: url,
-                type: 'POST',
-                data: {
-                    _token: CSRF_TOKEN, 
-                    name: name
-                },
-                success: function(data) {
-                    // Create pills
-                    $('#search-country-dropdown', function() {
-                        var id = data.country.id;
-                        var name = data.country.name;
-                        $('#add-country').append($('<a>', {
-                            class : 'badge badge-pill badge-dark pill-rm',
-                            text : name,
-                            href: '#'
-                        }).append($('<input>', {
-                            value : id,
-                            name : 'countries[]',
-                            hidden : 'hidden'
-                        })));
-                    });
-                    
-                }
-            });
-        });
-        
+            create_entity(name, url, 'country');
+        });       
     });
 </script>
