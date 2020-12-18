@@ -19,7 +19,7 @@ class CreateReviewsTable extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('film_id')->constrained()->onDelete('cascade');
             $table->integer('score');
-            $table->date('watch-date');
+            $table->date('watch_date');
             $table->text('comment')->nullable();
             $table->timestamps();
 
