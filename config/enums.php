@@ -2,6 +2,6 @@
 
 return [
     'credits' => [
-        'Director', 'Writer'
+        'Director', 'Writer', 'Acting'
     ]
 ];

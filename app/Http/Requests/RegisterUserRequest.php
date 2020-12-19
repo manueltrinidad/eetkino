@@ -27,7 +27,7 @@ class RegisterUserRequest extends FormRequest
         $api_key = env('REZISOORBOT_API_KEY');
         return [
             'username' => ['required', 'string', 'max:50'],
-            'chat_id' => ['required', 'string', 'unique:users', 'max:255'],
+            'chat_id' => ['required', 'string', 'unique:users,chat_id', 'max:255'],
             'api_key' => ['required', Rule::in([$api_key])]
         ];
     }
