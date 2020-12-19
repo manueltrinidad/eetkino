@@ -15,6 +15,7 @@ In this scenario, I am managing EETKiNO's Authentication as `chat_id` from Teleg
 **Requirements**
 
 - Follow the [Laravel Install instructions](https://laravel.com/docs/master#installation) to install Laravel requirements.
+- You will need to get a [TMDb API Key](https://www.themoviedb.org/documentation/api).
 - Follow usual Laravel setup:
 
 ```bash
@@ -25,7 +26,7 @@ php artisan key:generate
 php artisan migrate
 ```
 
-In `.env`, write your [TMDb API Key](https://www.themoviedb.org/documentation/api).
+In `.env`, write your TMDb key.
 
 ## API Endpoints
 
