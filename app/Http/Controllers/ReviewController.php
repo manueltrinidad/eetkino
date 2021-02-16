@@ -1,56 +1,49 @@
 <?php
 
+
 namespace App\Http\Controllers;
-use App\Http\Requests\StoreReviewRequest;
-use App\Repositories\FilmRepository;
-use App\Repositories\ReviewRepository;
-use App\Repositories\TmdbRepository;
-use App\Repositories\UserRepository;
-use App\Services\FilmService;
+
+
 use App\Services\ReviewService;
+use Illuminate\Http\Request;
+use Laravel\Lumen\Routing\Controller;
 
 class ReviewController extends Controller
 {
-    private $tmdbRepository;
-    private $filmRepository;
-    private $reviewRepository;
-    private $userRepository;
+    private ReviewService $reviewService;
 
-    public function __construct(TmdbRepository $tmdbRepository, FilmRepository $filmRepository,
-                                ReviewRepository $reviewRepository, UserRepository $userRepository)
+    /**
+     * ReviewController constructor.
+     * @param $reviewService
+     */
+    public function __construct(ReviewService $reviewService)
     {
-        $this->tmdbRepository = $tmdbRepository;
-        $this->filmRepository = $filmRepository;
-        $this->reviewRepository = $reviewRepository;
-        $this->userRepository = $userRepository;
+        $this->reviewService = $reviewService;
     }
 
-    public function store(StoreReviewRequest $request, FilmService $filmService, ReviewService $reviewService)
+    public function store(Request $request)
     {
-        $attr = $request->validated();
-        if(!$this->filmRepository->getFilmById($attr['tmdb_id']))
-        {
-            $tmdbFilm = $this->tmdbRepository->getFilmById($attr['tmdb_id']);
-            if(!$tmdbFilm) {
-                return response("Film ID doesn't exist in TMDb", 400);
-            }
+        return $this->reviewService->reviewStore($request);
+    }
 
-            if(!$filmService->storeFilmAndPeople($tmdbFilm)) {
-                return response("Error in the server.", 500);
-            }
-        }
+    public function show(Request $request)
+    {
 
-        $film = $this->filmRepository->getFilmWithPeopleById($attr['tmdb_id']);
-        $user = $this->userRepository->getUserByChatId($attr['chat_id']);
+    }
 
-        if($this->reviewRepository->getReviewByUserAndFilmId($user->id, $film->id)) {
-            return response("User review for this movie already exists.", 400);
-        }
+    public function update(Request $request)
+    {
 
-        if(!$reviewService->store($attr, $user->id, $film->id)) {
-            return response("Error in the server.", 500);
-        }
+    }
 
-        return $this->reviewRepository->getReviewByUserAndFilmId($user->id, $film->id);
+    public function delete(Request $request)
+    {
+
+    }
+
+    public function showByUsername(Request $request, $username)
+    {
+
+        return $this->reviewService->showByUsername($username, $request);
     }
 }

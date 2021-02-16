@@ -1,6 +1,8 @@
 <?php
 
+
 namespace Database\Seeders;
+
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -17,9 +19,8 @@ class CountrySeeder extends Seeder
         $countries = config('countries.full');
         for ($i = 0; $i < count($countries); $i++) {
             DB::table('countries')->insert([
-                'slug' => $countries[$i]->Slug,
-                'name' => $countries[$i]->Country,
-                'code' =>$countries[$i]->ISO2
+                'id' => $countries[$i]->id,
+                'name' => $countries[$i]->name
             ]);
         }
     }

@@ -1,59 +1,24 @@
-# EETKiNO
+# Lumen PHP Framework
 
-**A platform for writing film reviews.**
+[![Build Status](https://travis-ci.org/laravel/lumen-framework.svg)](https://travis-ci.org/laravel/lumen-framework)
+[![Total Downloads](https://img.shields.io/packagist/dt/laravel/framework)](https://packagist.org/packages/laravel/lumen-framework)
+[![Latest Stable Version](https://img.shields.io/packagist/v/laravel/framework)](https://packagist.org/packages/laravel/lumen-framework)
+[![License](https://img.shields.io/packagist/l/laravel/framework)](https://packagist.org/packages/laravel/lumen-framework)
 
-## Work flow
+Laravel Lumen is a stunningly fast PHP micro-framework for building web applications with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Lumen attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as routing, database abstraction, queueing, and caching.
 
-The philosophy behind EETKiNO is to be an API for user, film, and review store / retrieval once the agent accessing the platform has been Authenticated. 
+## Official Documentation
 
-In other words, if you have the API key to EETKiNO, you can manage **all the data**. This is specially useful for a case where you have already Authenticated the user through means where the user can't use explicitly a key, but the backend of their application handles that for them.
+Documentation for the framework can be found on the [Lumen website](https://lumen.laravel.com/docs).
 
-In this scenario, I am managing EETKiNO's Authentication as `chat_id` from Telegram, where I intend to write a review system through a Telegram bot.
+## Contributing
 
-## Install Instructions
+Thank you for considering contributing to Lumen! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-**Requirements**
+## Security Vulnerabilities
 
-- Follow the [Laravel Install instructions](https://laravel.com/docs/master#installation) to install Laravel requirements.
-- You will need to get a [TMDb API Key](https://www.themoviedb.org/documentation/api).
-- Follow usual Laravel setup:
+If you discover a security vulnerability within Lumen, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
 
-```bash
-composer update
-composer install
-cp .env.example .env
-php artisan key:generate
-php artisan migrate
-```
+## License
 
-In `.env`, write your TMDb key.
-
-## API Endpoints
-
-All API endpoints start with `/api`. 
-
-### User
-
-#### `/register/`
-
-**POST > Register a user.**
-
-| Parameter | Type   | Required | Description                   |
-|-----------|--------|----------|-------------------------------|
-| username  | string | yes      | Nickname of the user.         |
-| chat_id   | string | yes      | Telegram chat_id of the User. |
-| api_key   | string | yes      | EETKiNO API Key.              |
-
-### Review
-
-#### `/review/`
-
-**POST > Create a review**
-
-| Parameter | Type   | Required | Description                   |
-|-----------|--------|----------|-------------------------------|
-| chat_id   | string | yes      | Telegram chat_id of the User. |
-| api_key   | string | yes      | EETKiNO API Key.              |
-| tmdb_id   | string | yes      | Film ID from Review           |
-| score     | int    | yes      | Score 0-100 for the Film      |
-| comment   | string | no       | Thoughts on the film.         |
+The Lumen framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
