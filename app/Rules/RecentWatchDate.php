@@ -22,7 +22,7 @@ class RecentWatchDate implements Rule
      */
     public function passes($attribute, $value): bool
     {
-        if(!DateTime::createFromFormat('Y-m-d','20200-12-14')) {
+        if(!DateTime::createFromFormat('Y-m-d', $value)) {
             return false;
         }
         $date = strtotime($value);
