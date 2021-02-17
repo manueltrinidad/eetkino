@@ -5,7 +5,14 @@ namespace App\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 
+
+/**
+ * Person
+ *
+ * @mixin Builder
+ */
 class Person extends Model
 {
     protected $guarded = [];

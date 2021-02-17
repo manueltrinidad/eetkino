@@ -7,6 +7,7 @@ namespace App\Repositories;
 use App\Exceptions\Movie\MovieNotFoundException;
 use App\Exceptions\Review\ReviewNotCreatedException;
 use App\Exceptions\Review\ReviewNotFoundException;
+use App\Exceptions\Review\ReviewNotUpdated;
 use App\Exceptions\User\UserNotFoundException;
 use App\Models\Movie;
 use App\Models\Review;
@@ -89,6 +90,23 @@ class ReviewRepository
     {
         try {
             Review::where('id', '=', $id)->firstOrFail()->delete();
+        } catch (ModelNotFoundException) {
+            throw new ReviewNotFoundException('The Review could not be found');
+        }
+    }
+
+    /**
+     * @param int $id
+     * @param array $properties
+     * @throws ReviewNotFoundException
+     * @throws ReviewNotUpdated
+     */
+    public function updateById(int $id, array $properties)
+    {
+        try {
+            if(!Review::where('id', '=', $id)->firstOrFail()->update($properties)) {
+                throw new ReviewNotUpdated('The Review could not be updated');
+            }
         } catch (ModelNotFoundException) {
             throw new ReviewNotFoundException('The Review could not be found');
         }

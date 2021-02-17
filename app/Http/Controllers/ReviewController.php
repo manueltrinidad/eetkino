@@ -31,9 +31,9 @@ class ReviewController extends Controller
 
     }
 
-    public function update(Request $request)
+    public function update(Request $request, int $id)
     {
-
+        return $this->reviewService->updateByApiKey($request, $id);
     }
 
     public function delete(Request $request, int $id)

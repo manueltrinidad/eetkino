@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Exceptions\Movie\MovieNotFoundException;
 use App\Exceptions\Review\ReviewNotCreatedException;
 use App\Exceptions\Review\ReviewNotFoundException;
+use App\Exceptions\Review\ReviewNotUpdated;
 use App\Exceptions\User\ApiKeyNotFromUserException;
 use App\Exceptions\User\UserNotFoundException;
 use App\Repositories\MovieRepository;
@@ -112,9 +113,45 @@ class ReviewService
         }
     }
 
-    public function updateByApiKey()
+    /**
+     * @param Request $request
+     * @param int $reviewId
+     * @return Response|ResponseFactory
+     */
+    public function updateByApiKey(Request $request, int $reviewId)
     {
-        //
+        try {
+            $rules = [
+                'api_key' => 'required|exists:users,api_key',
+                'review_id' => 'required|exists:reviews,id',
+                'score' => 'integer|min:0|max:100',
+                'comment' => 'max:10000|string',
+                'tmdb_id' => 'string|max:20',
+                'is_public' => 'boolean',
+                'is_draft' => 'boolean',
+                'watch_date' => ['date', new RecentWatchDate()]
+            ];
+            $inputToValidate = $request->all();
+            $inputToValidate['review_id'] = $reviewId;
+            $validated = Validator::make($inputToValidate, $rules)->validated();
+            if($this->isReviewByUserApiKey($validated['review_id'], $validated['api_key'])) {
+                unset($validated['api_key'], $validated['review_id']);
+                $this->reviewRepository->updateById($reviewId, $validated);
+                return response($this->reviewRepository->getById($reviewId));
+            } else throw new ApiKeyNotFromUserException();
+
+        } catch (ValidationException $e) {
+            if(isset($e->errors()['api_key'])) {
+                return response(['errors' => ['Unauthorized Action']], status: 401);
+            }
+            return response(['errors' => $e->errors()], status: 400);
+        } catch (ReviewNotFoundException) {
+            return response(['errors' => ['Review not found']], status: 404);
+        } catch (UserNotFoundException | ApiKeyNotFromUserException) {
+            return response(['errors' => ['Unauthorized Action']], status: 401);
+        } catch (ReviewNotUpdated) {
+            return response(['errors' => ['There was an error performing your request.']], status: 500);
+        }
     }
 
     /**
