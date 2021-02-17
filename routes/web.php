@@ -29,8 +29,8 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
     $router->group(['prefix' => 'review'], function () use ($router) {
         $router->get('', 'ReviewController@show');
         $router->post('store', 'ReviewController@store');
-        $router->delete('delete', 'ReviewController@delete');
         $router->get('u/{username}', 'ReviewController@showByUsername');
+        $router->delete('{id}', 'ReviewController@delete');
     });
 
 });

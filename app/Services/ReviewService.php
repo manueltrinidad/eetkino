@@ -4,6 +4,11 @@
 namespace App\Services;
 
 
+use App\Exceptions\Movie\MovieNotFoundException;
+use App\Exceptions\Review\ReviewNotCreatedException;
+use App\Exceptions\Review\ReviewNotFoundException;
+use App\Exceptions\User\ApiKeyNotFromUserException;
+use App\Exceptions\User\UserNotFoundException;
 use App\Repositories\MovieRepository;
 use App\Repositories\ReviewRepository;
 use App\Repositories\UserRepository;
@@ -46,30 +51,20 @@ class ReviewService
      */
     public function reviewStore(Request $request): Response|ResponseFactory
     {
-        $rules = [
-            'api_key' => 'required|exists:users,api_key',
-            'score' => 'required|integer|min:0|max:100',
-            'comment' => 'max:10000|string',
-            'tmdb_id' => 'required|string|max:20',
-            'is_public' => 'boolean',
-            'is_draft' => 'boolean',
-            'watch_date' => ['required', 'date', new RecentWatchDate()]
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return response(["errors" => $validator->errors()->all()], status: 400);
-        }
-
         try {
-            $validated = $validator->validated();
+
+            $rules = [
+                'api_key' => 'required|exists:users,api_key',
+                'score' => 'required|integer|min:0|max:100',
+                'comment' => 'max:10000|string',
+                'tmdb_id' => 'required|string|max:20',
+                'is_public' => 'boolean',
+                'is_draft' => 'boolean',
+                'watch_date' => ['required', 'date', new RecentWatchDate()]
+            ];
+            $validated = Validator::make($request->all(), $rules)->validated();
             $userId = $this->userRepository->getUserProperties('api_key', $validated['api_key'], 'id')['id'];
             $movie = $this->movieRepository->findOrCreate($validated['tmdb_id']);
-            if(!$movie)
-            {
-                return response(["errors" => ['The Movie Id (TMDb) is invalid.']], status: 400);
-            }
             unset($validated['api_key']);
             unset($validated['tmdb_id']);
             $reviewData = [
@@ -79,15 +74,14 @@ class ReviewService
                     'movie_id' => $movie['id']
                 ]
             ];
-            $review = $this->reviewRepository->create($reviewData);
-            if($review) {
-                return response($review, status: 201);
-            } else {
-                return response(['errors' => ['There was an error creating your review.']], status: 500);
-            }
+            return response($this->reviewRepository->create($reviewData), status: 201);
 
-        } catch (ValidationException) {
-            return response(["errors" => ["There was an error validating your data."]], status: 500);
+        } catch (ValidationException $e) {
+            return response(['errors' => $e->errors()], status: 400);
+        } catch (MovieNotFoundException | UserNotFoundException $e) {
+            return response(['errors' => [$e->getMessage()]], 404);
+        } catch (ReviewNotCreatedException $e) {
+            return response(['errors' => [$e->getMessage()]], 500);
         }
     }
 
@@ -100,19 +94,94 @@ class ReviewService
      */
     public function showByUsername(string $username, Request $request): Response|ResponseFactory
     {
-        $authenticated = false;
-        if($request->api_key) {
-            if(!$this->userRepository->isApiKeyFromUser($request->api_key, 'username', $username))
-            {
-                return response(["errors" => ['The API Key or username is invalid']], status: 400);
+        try {
+
+            $authenticated = false;
+            if (isset($request->api_key)) {
+                if (!$this->isApiKeyFromUser($request->api_key, 'username', $username)) {
+                    throw new ApiKeyNotFromUserException('Unauthorized Access');
+                }
+                $authenticated = true;
             }
-            $authenticated = true;
+            return response($this->reviewRepository->getByUser('username', $username, $authenticated));
+
+        } catch (ApiKeyNotFromUserException $e) {
+            return response(["errors" => [$e->getMessage()]], status: 401);
+        } catch (UserNotFoundException $e) {
+            return response(['errors' => [$e->getMessage()]], 404);
         }
-        $reviews = $this->reviewRepository->getByUser('username', $username, $authenticated);
-        if($reviews === null)
-        {
-            return response(["errors" => ["The username doesn't exist"]], status: 404);
+    }
+
+    public function updateByApiKey()
+    {
+        //
+    }
+
+    /**
+     * @param Request $request
+     * @param int $reviewId
+     * @return Response|ResponseFactory
+     */
+    public function deleteByApiKey(Request $request, int $reviewId): Response|ResponseFactory
+    {
+        try {
+            $rules = [
+                'api_key' => 'required|exists:users,api_key',
+                'review_id' => 'required|exists:reviews,id'
+            ];
+            $validated = Validator::make([
+                'api_key' => $request->api_key,
+                'review_id' => $reviewId
+            ], $rules)->validated();
+
+            if($this->isReviewByUserApiKey($validated['review_id'], $validated['api_key'])) {
+                $this->reviewRepository->deleteById($reviewId);
+                return response(status: 204);
+            } else throw new ApiKeyNotFromUserException();
+
+        } catch (ValidationException | ReviewNotFoundException | UserNotFoundException) {
+            return response(['errors' => ['API Key or Review ID provided are invalid']], status: 400);
+        } catch (ApiKeyNotFromUserException) {
+            return response(['errors' => ['Unauthorized action']], status: 401);
         }
-        return response($reviews);
+
+    }
+
+    /**
+     * Tests if the review belongs to the User authenticated by the API Key.
+     * @param int $reviewId
+     * @param string $apiKey
+     * @return bool
+     * @throws ReviewNotFoundException
+     * @throws UserNotFoundException
+     */
+    private function isReviewByUserApiKey(int $reviewId, string $apiKey): bool
+    {
+        try {
+            $reviewUserId = $this->reviewRepository->getById($reviewId)['user_id'];
+            $userId = $this->userRepository->getUserProperties('api_key', $apiKey, 'id')['id'];
+            return $reviewUserId === $userId;
+        } catch (ReviewNotFoundException | UserNotFoundException $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Tests the API key against the User providing a key and value to query it. Returns
+     * true / false if it is authenticated.
+     * @param string $inputApiKey
+     * @param string $key id, username, email, api_key (last one beats the purpose tho)
+     * @param string $value value of the key.
+     * @return bool|null
+     * @throws UserNotFoundException
+     */
+    private function isApiKeyFromUser(string $inputApiKey, string $key, string $value): ?bool
+    {
+        try {
+            $userApiKey = $this->userRepository->getUserProperties($key, $value, 'api_key')['api_key'];
+            return $userApiKey === $inputApiKey;
+        } catch (UserNotFoundException $e) {
+            throw $e;
+        }
     }
 }

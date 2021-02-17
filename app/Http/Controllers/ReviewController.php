@@ -36,14 +36,13 @@ class ReviewController extends Controller
 
     }
 
-    public function delete(Request $request)
+    public function delete(Request $request, int $id)
     {
-
+        return $this->reviewService->deleteByApiKey($request, $id);
     }
 
     public function showByUsername(Request $request, $username)
     {
-
         return $this->reviewService->showByUsername($username, $request);
     }
 }

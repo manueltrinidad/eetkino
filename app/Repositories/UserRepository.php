@@ -4,6 +4,7 @@
 namespace App\Repositories;
 
 
+use App\Exceptions\User\UserNotFoundException;
 use App\Models\User;
 use Exception;
 use App\Traits\GetModelPropertiesTrait;
@@ -47,7 +48,6 @@ class UserRepository
      * Gets a User using any method (key) of Authentication. Returns Null upon failure.
      * @param string $key id or api_key
      * @param string $value Value of the Key.
-     * @param mixed ...$properties
      * @return array|null
      */
     public function getUser(string $key, string $value): ?array
@@ -65,6 +65,7 @@ class UserRepository
      * @param string $value
      * @param mixed ...$properties
      * @return array|null
+     * @throws UserNotFoundException
      */
     public function getUserProperties(string $key, string $value, ...$properties): ?array
     {
@@ -72,25 +73,8 @@ class UserRepository
             $user = User::where($key, '=', $value)->firstOrFail();
             return $this->getProperties($user, $properties);
         } catch (ModelNotFoundException) {
-            return null;
+            throw new UserNotFoundException("The provided id for {$key} was not found.");
         }
     }
 
-    /**
-     * Tests the API key against the User providing a key and value to query it. Returns
-     * true / false if it is authenticated and null if the User wasn't found.
-     * @param string $api_key
-     * @param string $key id, username, email, api_key (last one beats the purpose tho)
-     * @param string $value value of the key.
-     * @return bool|null
-     */
-    public function isApiKeyFromUser(string $api_key, string $key, string $value): ?bool
-    {
-        try {
-            $user = User::where($key, '=', $value)->firstOrFail();
-            return $user->api_key === $api_key;
-        } catch (ModelNotFoundException) {
-            return null;
-        }
-    }
 }

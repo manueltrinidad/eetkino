@@ -4,6 +4,7 @@
 namespace App\Repositories;
 
 
+use App\Exceptions\Movie\MovieNotFoundException;
 use App\Models\Country;
 use App\Models\Movie;
 use App\Models\Person;
@@ -37,6 +38,7 @@ class MovieRepository
      * Gets a Movie from the Database. Creates it if it doesn't exist. Must use TMDb Id.
      * @param string $tmdbId
      * @return array|null
+     * @throws MovieNotFoundException
      */
     public function findOrCreate(string $tmdbId): ?array
     {
@@ -44,7 +46,11 @@ class MovieRepository
         if ($movie) {
             return $movie;
         } else {
-            return $this->createMovie($tmdbId);
+            $movie = $this->createMovie($tmdbId);
+            if(!$movie) {
+                throw new MovieNotFoundException('The Movie Id (TMDb) was not found.');
+            }
+            return $movie;
         }
     }
 
