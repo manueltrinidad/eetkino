@@ -16,7 +16,7 @@
 use Laravel\Lumen\Routing\Router;
 
 $router->get('/', function () use ($router) {
-    return view("index", ["name" => "ur mom gay"]);
+    return view("index", ["name" => ""]);
 });
 
 $router->group(['prefix' => 'api/v1'], function () use ($router) {
