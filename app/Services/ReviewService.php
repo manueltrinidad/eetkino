@@ -88,7 +88,7 @@ class ReviewService
 
     /**
      * Gets all reviews by a User. Excludes drafts. If the Request includes the api key,
-     * it will be authenticated. If the
+     * it will be authenticated.
      * @param string $username
      * @param Request $request
      * @return Response|ResponseFactory
@@ -114,11 +114,12 @@ class ReviewService
     }
 
     /**
+     * Updates a Review authenticating the User by API Key.
      * @param Request $request
      * @param int $reviewId
      * @return Response|ResponseFactory
      */
-    public function updateByApiKey(Request $request, int $reviewId)
+    public function updateByApiKey(Request $request, int $reviewId): Response|ResponseFactory
     {
         try {
             $rules = [
@@ -155,6 +156,7 @@ class ReviewService
     }
 
     /**
+     * Deletes a Review authenticating the User by API Key.
      * @param Request $request
      * @param int $reviewId
      * @return Response|ResponseFactory

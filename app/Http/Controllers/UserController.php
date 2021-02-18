@@ -26,8 +26,23 @@ class UserController extends Controller
         return $this->userService->registerUser($request);
     }
 
-    public function delete(Request $request)
+    public function delete(Request $request, string $username)
     {
-        return $this->userService->deleteUser($request);
+        return $this->userService->deleteUser($request, $username);
+    }
+
+    public function getByApiKey(Request $request)
+    {
+        return $this->userService->getByApiKey($request);
+    }
+
+    public function showProfile(string $username)
+    {
+        return $this->userService->showProfile($username);
+    }
+
+    public function newApiKey(Request $request)
+    {
+        return $this->userService->newKeyByEmailPassword($request);
     }
 }

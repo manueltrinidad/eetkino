@@ -4,9 +4,10 @@
 namespace App\Repositories;
 
 
+use App\Exceptions\User\UserNotDeletedException;
 use App\Exceptions\User\UserNotFoundException;
+use App\Exceptions\User\UserNotRegisteredException;
 use App\Models\User;
-use Exception;
 use App\Traits\GetModelPropertiesTrait;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
@@ -20,27 +21,35 @@ class UserRepository
      * is usually hidden. Returns null upon failure.
      * @param $userData array
      * @return array|null
+     * @throws UserNotRegisteredException
      */
     public function registerUser(array $userData): ?array
     {
         try {
             return User::create($userData)->makeVisible('api_key')->toArray();
         } catch (QueryException) {
-            return null;
+            throw new UserNotRegisteredException();
         }
     }
 
     /**
-     * Deletes a User provided an email. Authentication must be done beforehand!
-     * @param string $email
+     * Deletes a User identified by a key. Authentication must be done beforehand!
+     * @param string $key
+     * @param string $value
      * @return bool|null
+     * @throws UserNotFoundException
+     * @throws UserNotDeletedException
      */
-    public function deleteByEmail(string $email): ?bool
+    public function deleteByKeyValue(string $key, string $value): ?bool
     {
         try {
-            return User::where('email', '=', $email)->delete();
-        } catch (Exception) {
-            return false;
+            if(User::where($key, '=', $value)->firstOrFail()->delete()) {
+                return true;
+            } else {
+                throw new UserNotDeletedException();
+            }
+        } catch (ModelNotFoundException) {
+            throw new UserNotFoundException();
         }
     }
 
@@ -48,14 +57,19 @@ class UserRepository
      * Gets a User using any method (key) of Authentication. Returns Null upon failure.
      * @param string $key id or api_key
      * @param string $value Value of the Key.
+     * @param bool $withApiKey
      * @return array|null
+     * @throws UserNotFoundException
      */
-    public function getUser(string $key, string $value): ?array
+    public function getUser(string $key, string $value, bool $withApiKey = false): ?array
     {
         try {
+            if($withApiKey) {
+                return User::where($key, '=', $value)->firstOrFail()->makeVisible('api_key')->toArray();
+            }
             return User::where($key, '=', $value)->firstOrFail()->toArray();
         } catch (ModelNotFoundException) {
-            return null;
+            throw new UserNotFoundException('The User was not found');
         }
     }
 
@@ -77,4 +91,19 @@ class UserRepository
         }
     }
 
+    /**
+     * Updates an array of properties on a User given a key and value to query it.
+     * @param string $key
+     * @param string $value
+     * @param array $properties
+     * @throws UserNotFoundException
+     */
+    public function update(string $key, string $value, array $properties)
+    {
+        try {
+            User::where($key, '=', $value)->firstOrFail()->update($properties);
+        } catch (ModelNotFoundException) {
+            throw new UserNotFoundException("The provided id for {$key} was not found.");
+        }
+    }
 }

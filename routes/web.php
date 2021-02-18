@@ -23,7 +23,10 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
     $router->group(['prefix' => 'user'], function () use ($router) {
         $router->post('register', 'UserController@register');
-        $router->delete('delete', 'UserController@delete');
+        $router->get('auth', 'UserController@getByApiKey');
+        $router->put('new-key', 'UserController@newApiKey');
+        $router->get('{username}', 'UserController@showProfile');
+        $router->delete('{username}/delete', 'UserController@delete');
     });
 
     $router->group(['prefix' => 'review'], function () use ($router) {
