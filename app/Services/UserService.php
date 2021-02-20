@@ -59,7 +59,7 @@ class UserService
         } catch (RouteNotEnabledException) {
             return response(['errors' => ['Forbidden']], 403);
         } catch (UserNotRegisteredException) {
-            return response(['errors' => ['Internal server error']]);
+            return response(['errors' => ['Internal server error']], 500);
         }
     }
 
