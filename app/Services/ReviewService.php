@@ -12,6 +12,7 @@ use App\Exceptions\User\ApiKeyNotFromUserException;
 use App\Exceptions\User\UserNotFoundException;
 use App\Repositories\MovieRepository;
 use App\Repositories\ReviewRepository;
+use App\Repositories\TMDbRepository;
 use App\Repositories\UserRepository;
 use App\Rules\RecentWatchDate;
 use Illuminate\Http\Request;
@@ -24,22 +25,22 @@ class ReviewService
 {
     private ReviewRepository $reviewRepository;
     private UserRepository $userRepository;
-    private TMDbService $tmdbService;
+    private TMDbRepository $tmdbRepository;
     private MovieRepository $movieRepository;
 
     /**
      * ReviewService constructor.
      * @param ReviewRepository $reviewRepository
      * @param UserRepository $userRepository
-     * @param TMDbService $tmdbService
+     * @param TMDbRepository $tmdbRepository
      * @param MovieRepository $movieRepository
      */
     public function __construct(ReviewRepository $reviewRepository, UserRepository $userRepository,
-                                TMDbService $tmdbService, MovieRepository $movieRepository)
+                                TMDbRepository $tmdbRepository, MovieRepository $movieRepository)
     {
         $this->reviewRepository = $reviewRepository;
         $this->userRepository = $userRepository;
-        $this->tmdbService = $tmdbService;
+        $this->tmdbRepository = $tmdbRepository;
         $this->movieRepository = $movieRepository;
     }
 

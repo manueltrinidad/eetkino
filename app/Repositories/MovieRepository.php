@@ -8,7 +8,6 @@ use App\Exceptions\Movie\MovieNotFoundException;
 use App\Models\Country;
 use App\Models\Movie;
 use App\Models\Person;
-use App\Services\TMDbService;
 use App\Traits\GetModelPropertiesTrait;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -18,20 +17,20 @@ class MovieRepository
 
     private PersonRepository $personRepository;
     private CountryRepository $countryRepository;
-    private TMDbService $tmdbService;
+    private TMDbRepository $tmdbRepository;
 
     /**
      * MovieRepository constructor.
      * @param PersonRepository $personRepository
      * @param CountryRepository $countryRepository
-     * @param TMDbService $tmdbService
+     * @param TMDbRepository $tmdbRepository
      */
     public function __construct(PersonRepository $personRepository, CountryRepository $countryRepository,
-                                TMDbService $tmdbService)
+                                TMDbRepository $tmdbRepository)
     {
         $this->personRepository = $personRepository;
         $this->countryRepository = $countryRepository;
-        $this->tmdbService = $tmdbService;
+        $this->tmdbRepository = $tmdbRepository;
     }
 
     /**
@@ -76,7 +75,7 @@ class MovieRepository
      */
     public function createMovie(string $tmdbId): ?array
     {
-        $tmdbMovie = $this->tmdbService->getMovieOrNull($tmdbId);
+        $tmdbMovie = $this->tmdbRepository->getMovieOrNull($tmdbId);
 
         if (!$tmdbMovie) {
             return null;

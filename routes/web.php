@@ -16,7 +16,7 @@
 use Laravel\Lumen\Routing\Router;
 
 $router->get('/', function () use ($router) {
-    return view("index", ["name" => ""]);
+    return view("index", ['title' => 'EETKINO']);
 });
 
 $router->group(['prefix' => 'api/v1'], function () use ($router) {
@@ -35,6 +35,12 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->get('u/{username}', 'ReviewController@showByUsername');
         $router->delete('{id}', 'ReviewController@delete');
         $router->put('{id}', 'ReviewController@update');
+    });
+
+    // Endpoints for Movie and TMDDb are combined since the end-user doesn't have to know
+    // about how Movie information is gathered.
+    $router->group(['prefix' => 'movie'], function () use ($router) {
+        $router->get('search', 'MovieController@search');
     });
 
 });

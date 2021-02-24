@@ -44,10 +44,10 @@ class UserService
             }
             $rules = [
                 'email' => 'required|email|unique:users,email',
-                'password' => 'required|string|min:8|max:150',
+                'password' => 'required|string|min:8|max:150|confirmed',
                 'username' => 'required|string|max:50|alpha_dash|unique:users,username'
             ];
-            $validated = Validator::make($request->all(), $rules)->validated();
+            $validated = Validator::make($request->all(), $rules)->validate();
             $validated['password_hash'] = password_hash($validated['password'], PASSWORD_DEFAULT);
             $validated['api_key'] = $this->generateApiKey();
             unset($validated['password']);
@@ -57,7 +57,7 @@ class UserService
         } catch (ValidationException $e) {
             return response(["errors" => $e->errors()], status: 400);
         } catch (RouteNotEnabledException) {
-            return response(['errors' => ['Forbidden']], 403);
+            return response(['errors' => ['Unauthorized']], 401);
         } catch (UserNotRegisteredException) {
             return response(['errors' => ['Internal server error']], 500);
         }
@@ -79,7 +79,7 @@ class UserService
             ];
             $dataToValidate = $request->all();
             $dataToValidate['username'] = $username;
-            $validated = Validator::make($dataToValidate, $rules)->validated();
+            $validated = Validator::make($dataToValidate, $rules)->validate();
             if(!$this->authenticateUserByKeyPassword('username', $validated['username'], $validated['password'])) {
                 throw new UserNotAuthenticatedException();
             }
@@ -105,7 +105,7 @@ class UserService
         try {
 
             $rules = ['api_key' => 'required|exists:users,api_key'];
-            $validated = Validator::make($request->query(), $rules)->validated();
+            $validated = Validator::make($request->query(), $rules)->validate();
             return response($this->userRepository->getUser('api_key', $validated['api_key']));
 
         } catch (ValidationException | UserNotFoundException) {
@@ -123,7 +123,7 @@ class UserService
         try {
 
             $rules = ['username' => 'required|exists:users,username'];
-            $validated = Validator::make(['username' => $username], $rules)->validated();
+            $validated = Validator::make(['username' => $username], $rules)->validate();
             return response($this->userRepository->getUser('username', $validated['username']));
 
         } catch (ValidationException|UserNotFoundException) {
@@ -144,7 +144,7 @@ class UserService
                 'email' => 'required|exists:users,email',
                 'password' => 'required|string'
             ];
-            $validated = Validator::make($request->all(), $rules)->validated();
+            $validated = Validator::make($request->all(), $rules)->validate();
             if($this->authenticateUserByKeyPassword('email', $validated['email'], $validated['password'])) {
                 $newKey = $this->generateApiKey();
                 $this->userRepository->update('email', $validated['email'], ['api_key' => $newKey]);
@@ -163,8 +163,8 @@ class UserService
     private function generateApiKey(): string
     {
         $apiKey = Str::random(20);
-        $validated = Validator::make(['api_key' => $apiKey], ['api_key' => 'unique:users,api_key']);
-        if($validated->fails())
+        $validator = Validator::make(['api_key' => $apiKey], ['api_key' => 'unique:users,api_key']);
+        if($validator->fails())
         {
             return $this->generateApiKey();
         }

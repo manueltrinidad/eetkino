@@ -1,0 +1,201 @@
+* {
+    margin: 0;
+    font-family: 'Catamaran', sans-serif;
+    color: #e2e2e2;
+    transition: all .2s;
+}
+
+body {
+    background-color: #262626;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+a {
+    text-decoration: none;
+}
+
+input {
+    background-color: #262626;
+    border-radius: .5rem;
+    border: 0;
+    padding: .5rem 1rem;
+}
+
+button {
+    border: none;
+}
+
+#container {
+    width: 1000px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#container > * {
+    margin-top: 1rem;
+}
+
+.hide {
+    display: none !important;
+}
+
+.btn {
+    padding: .5rem 1rem;
+    background-color: #29476a;
+    border-radius: .5rem;
+    cursor: pointer;
+}
+
+.btn:hover {
+    opacity: 80%;
+}
+
+#navbar {
+    width: 1000px;
+    height: 64px;
+    background-color: #1a1a1a;
+    margin-top: 1rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .5rem 1rem;
+}
+
+#home-link {
+    font-weight: 900;
+    font-size: 1.5rem;
+}
+
+#home-link:hover {
+    opacity: 80%;
+}
+
+#login-form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#login-form > * {
+    margin-left: 1rem;
+}
+
+#signup-form-cont {
+    background-color: #509f47;
+    width: 1000px;
+    padding: .5rem 1rem;
+    border-radius: 1rem;
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+#signup-form {
+    display: flex;
+    justify-content: space-between;
+}
+
+#signup-form > label {
+    display: flex;
+    flex-direction: column;
+}
+
+#signup-form > label > input {
+    background-color: #dfdfdf;
+    color: #262626;
+    padding: 0.2rem;
+}
+
+#new-api-key {
+    padding: .5rem;
+    border-radius: .5rem;
+    background-color: #143d00;
+    margin-top: 1rem;
+}
+
+#user-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#user-info > * {
+    margin-left: 1rem;
+}
+
+#review-cont {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+#movies-search-cont {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    width: 300px;
+    align-items: flex-start;
+}
+
+#movies-search {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.movie-cont {
+    padding: 0.3rem 0.8rem;
+    background-color: #1a1a1a;
+    border-radius: 1rem;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    margin-top: 0.7rem;
+}
+
+.review-input {
+    border: 1px solid #555555;
+}
+
+#movie-title-input {
+    padding: 0.3rem 0.8rem;
+    background-color: #1a1a1a;
+    border-radius: 1rem;
+    margin-top: 0.7rem;
+}
+
+#score-input {
+    width: 60px;
+    font-weight: bold;
+}
+
+#review-form {
+    display: flex;
+    flex-direction: column;
+}
+
+#review-form > * {
+    margin-bottom: 1rem;
+}
+
+#comment-input {
+    background-color: #1a1a1a;
+    border-radius: 1rem;
+    border: 1px solid #555555;
+    padding: 1rem;
+}
+
+#tmdb-id-input {
+    width: 60px;
+}
+
+#review-form > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
